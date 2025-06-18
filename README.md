@@ -53,3 +53,9 @@ This listens to Vapi’s end-of-call webhook.
 Based on the transcript and metadata, it:
 
 Logs the result to Google Sheets
+
+![image](https://github.com/user-attachments/assets/4b0f8d07-0e1a-40ac-9076-ec75db06a7d3)
+
+
+![image](https://github.com/user-attachments/assets/8d51f81f-f8cd-4430-80f8-708c68f7fe38)
+
