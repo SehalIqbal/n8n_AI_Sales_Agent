@@ -59,3 +59,6 @@ Logs the result to Google Sheets
 
 ![image](https://github.com/user-attachments/assets/8d51f81f-f8cd-4430-80f8-708c68f7fe38)
 
+
+![image](https://github.com/user-attachments/assets/bb72d3f5-8493-4720-a06c-8b5dd417c4a1)
+
