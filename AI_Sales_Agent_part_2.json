@@ -1,0 +1,1305 @@
+{
+  "name": "AI Sales Agent_part 2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "92a70fa0-101a-4ff1-952c-0e3fde4cdd04",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -3620,
+        420
+      ],
+      "id": "d1350014-90ba-4984-a70b-0747790a29b9",
+      "name": "Webhook",
+      "webhookId": "92a70fa0-101a-4ff1-952c-0e3fde4cdd04"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "98a471e7-a11b-4f4d-bad9-883a4eb7c149",
+              "leftValue": "={{ $json.body.message.type }}",
+              "rightValue": "end-of-call-report",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3400,
+        420
+      ],
+      "id": "8b1e25bf-f8f5-491c-825b-796e942257ad",
+      "name": "Event = end of call report"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3d0c5814-9525-423c-83da-ea816ad3bd04",
+              "leftValue": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+              "rightValue": "customer-did-not-answer",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "1c516af9-ae05-4e61-8047-2c37dc0baa35",
+              "leftValue": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+              "rightValue": "assistant-error",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "90f8dacc-999e-43c6-8310-2473a80574fb",
+              "leftValue": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+              "rightValue": "pipeline-error-*",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "803bc9ba-5deb-4178-b7ad-867c02c7d716",
+              "leftValue": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+              "rightValue": "pipeline-error-first-message-failed",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "1167bd40-a186-4308-8c06-454ec5339757",
+              "leftValue": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+              "rightValue": "pipeline-no-available-llm-model",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "2a233afe-174e-4c1c-916d-09fdfad2c4cb",
+              "leftValue": "",
+              "rightValue": "phone-call-provider-closed-websocket",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "a68b2bef-8566-4782-8eda-4db82982e348",
+              "leftValue": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+              "rightValue": "twilio-failed-to-connect-call",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "cac90381-640d-4823-9e4f-b3d5a4be0572",
+              "leftValue": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+              "rightValue": "unknown-error",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "bd6c6264-1c5a-40c2-b319-7081e101433b",
+              "leftValue": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+              "rightValue": "voicemail",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "d48ab726-415a-47cd-9bf0-df2aee6ec7f1",
+              "leftValue": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+              "rightValue": "leave a message",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2940,
+        400
+      ],
+      "id": "7b751f4c-47de-4e21-8bb1-742198a48ce0",
+      "name": "Condition  = Answered"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo-0125",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO-0125"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=this is the trancript for context {{ $('Event = end of call report').item.json.body.message.transcript }}\n\nBased on the following conversation between an AI sales assistant and a customer, did the customer express interest in scheduling the free consultation? Respond only with \"yes\" or \"no\".\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2780,
+        400
+      ],
+      "id": "213bc2d1-6f87-4539-8d74-1a5664ba011d",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "3OYXDXoth1nMzGpd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1caa6ca1-43f4-4820-8b27-08848827ce1f",
+              "leftValue": "={{ $json.message.content.toLowerCase().trim() }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2440,
+        400
+      ],
+      "id": "2547c64a-cbe4-4f30-bb6d-4c056d24dc89",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY",
+          "mode": "list",
+          "cachedResultName": "AI_Sales_Lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone number": "=",
+            "Status": "Interested",
+            "Name": "={{ $('Event = end of call report').item.json.body.message.call.customer.name }}"
+          },
+          "matchingColumns": [
+            "Name"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -2140,
+        320
+      ],
+      "id": "5323c857-6b26-4d52-a73b-cd1557b3d7a5",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4XDBupGPB746DKmp",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY",
+          "mode": "list",
+          "cachedResultName": "AI_Sales_Lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone number": "=",
+            "Status": "Not Interested",
+            "Name": "={{ $('Event = end of call report').item.json.body.message.call.customer.name }}"
+          },
+          "matchingColumns": [
+            "Name"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -2140,
+        500
+      ],
+      "id": "276cbf33-beba-4185-aba0-3a78a20d46c1",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4XDBupGPB746DKmp",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY",
+          "mode": "list",
+          "cachedResultName": "AI_Sales_Lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 623492138,
+          "mode": "list",
+          "cachedResultName": "Raw Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit#gid=623492138"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "transcript": "={{ $('Event = end of call report').item.json.body.message.artifact.transcript }}",
+            "recordingUrl": "={{ $('Event = end of call report').item.json.body.message.artifact.recordingUrl }}",
+            "endedReason": "={{ $('Event = end of call report').item.json.body.message.endedReason }}",
+            "cost_tts": "={{ $('Event = end of call report').item.json.body.message.costBreakdown.tts }}",
+            "cost_total": "={{ $('Event = end of call report').item.json.body.message.costBreakdown.total }}",
+            "cost_llm": "={{ $('Event = end of call report').item.json.body.message.costBreakdown.llm }}",
+            "cost_stt": "={{ $('Event = end of call report').item.json.body.message.costBreakdown.stt }}",
+            "durationMs": "={{ $('Event = end of call report').item.json.body.message.durationMs }}",
+            "endedAt": "={{ $('Event = end of call report').item.json.body.message.endedAt }}",
+            "startedAt": "={{ $('Event = end of call report').item.json.body.message.startedAt }}",
+            "type": "={{ $('Event = end of call report').item.json.body.message.type }}",
+            "id": "={{ $('Event = end of call report').item.json.body.message.call.id }}",
+            "phoneCallProviderId": "={{ $('Event = end of call report').item.json.body.message.call.phoneCallProviderId }}",
+            "phoneNumberId": "={{ $('Event = end of call report').item.json.body.message.call.phoneNumberId }}",
+            "customerNumber": "={{ $('Event = end of call report').item.json.body.message.call.customer.number }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phoneCallProviderId",
+              "displayName": "phoneCallProviderId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phoneNumberId",
+              "displayName": "phoneNumberId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customerNumber",
+              "displayName": "customerNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "startedAt",
+              "displayName": "startedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "endedAt",
+              "displayName": "endedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "durationMs",
+              "displayName": "durationMs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cost_stt",
+              "displayName": "cost_stt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cost_llm",
+              "displayName": "cost_llm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cost_tts",
+              "displayName": "cost_tts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cost_total",
+              "displayName": "cost_total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cost_twilio",
+              "displayName": "cost_twilio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "endedReason",
+              "displayName": "endedReason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcript",
+              "displayName": "transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recordingUrl",
+              "displayName": "recordingUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -3140,
+        400
+      ],
+      "id": "86dffbce-6f99-4ea1-b1a3-55b77cf76bc6",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4XDBupGPB746DKmp",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "sehal29.app.n8n.cloud",
+            "user-agent": "axios/1.8.3",
+            "content-length": "24044",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, br",
+            "baggage": "sentry-environment=production,sentry-public_key=a0021577936aec367b16615ad816c078,sentry-trace_id=17656395604e47298cc1690ac374ce19",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "44.249.246.224",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "94f36aa2a0c096ba-PDX",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "cookie": "callId=28760a98-4d2c-4ba4-a162-a146201ab52e",
+            "sentry-trace": "17656395604e47298cc1690ac374ce19-a6483dfff5cfec2e",
+            "traceparent": "00-49d34c84a7f2ab3a876aaf17412dacc9-2ed9a505543dc256-01",
+            "x-forwarded-for": "44.249.246.224, 104.23.160.102",
+            "x-forwarded-host": "sehal29.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-86-76bcc99db7-kzxtq",
+            "x-is-trusted": "yes",
+            "x-real-ip": "44.249.246.224",
+            "x-vapi-secret": ""
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "message": {
+              "timestamp": 1749836882183,
+              "type": "end-of-call-report",
+              "analysis": {
+                "summary": "A company called Business Experts offered the user a free 15-minute Google Meet consultation to discuss improving marketing and sales. The user was interested and asked how to proceed. A human representative will reach out via email to schedule the consultation at a time that works best for the user.",
+                "successEvaluation": "true"
+              },
+              "artifact": {
+                "messages": [
+                  {
+                    "role": "system",
+                    "message": "Role:\nYou are an AI sales assistant representing Business_experts. Your audience is small business owners and freelancers.\n\nTask:\nYour goal is to offer a free 15-minute Google Meet consultation with a human expert who provides personalized advice on online marketing, sales funnels, improving customer retention, social media advertising, and website conversion optimization.\n\nCall Introduction:\nWhen the call starts, introduce yourself and the purpose clearly and politely. For example:\n“Hi Sehal_Onic, this is Business_experts calling. We’re offering a free 15-minute Google Meet consultation with a human business expert who can help you improve your marketing and grow your sales.”\n\nHandling Questions:\nIf the lead asks for more details, explain that the consultation is personalized to their specific business goals and is completely free with no obligation.\n\nInterested Leads:\nIf the lead expresses interest, respond warmly and let them know:\n“We’ll have one of our human reps reach out soon via email to schedule the consultation at a time that works best for you.”\n\nMark their status as ‘interested’ in the system, thank them politely and end the call courteously using the \"endCall\" function.\n\nNot Interested Leads:\nIf the lead is not interested, thank them politely and end the call courteously using the \"endCall\" function..\n\nTone:\nMaintain a friendly, clear, confident, and professional tone throughout the call.\n\nIf lead stays quiet try to convince him again for him agree and make him interested\nif lead doesnt speak continue talking to him about the services human expert can provide to him",
+                    "time": 1749836771563,
+                    "secondsFromStart": 0
+                  },
+                  {
+                    "role": "bot",
+                    "message": "Hi, This is an outreach call from business experts.",
+                    "time": 1749836772894,
+                    "endTime": 1749836775794,
+                    "secondsFromStart": 1.12,
+                    "duration": 2900,
+                    "source": ""
+                  },
+                  {
+                    "role": "user",
+                    "message": "Could you please repeat? I couldn't hear you properly.",
+                    "time": 1749836780534,
+                    "endTime": 1749836782944,
+                    "secondsFromStart": 8.76,
+                    "duration": 2410
+                  },
+                  {
+                    "role": "bot",
+                    "message": "Of course. Hi. This is business experts calling. We're offering a free 15 minute Google Meet consultation. A human business expert who can help you improve your marketing and grow your sales. You be interested in hearing more?",
+                    "time": 1749836784924,
+                    "endTime": 1749836798694,
+                    "secondsFromStart": 13.15,
+                    "duration": 11520.0009765625,
+                    "source": ""
+                  },
+                  {
+                    "role": "user",
+                    "message": "Yeah. Could you please uh, explain",
+                    "time": 1749836799424,
+                    "endTime": 1749836802219,
+                    "secondsFromStart": 27.65,
+                    "duration": 2515
+                  },
+                  {
+                    "role": "bot",
+                    "message": "Absolutely. The consultation is a personalized session. 1 of our experts will talk to you about your specific business goals. They can provide tailored advice on various topics, including online marketing strategies, sales funnels, customer retention, improvements, social media advertising, and website conversion optimization. And the best part? It's completely free. With no obligation. You be interested in",
+                    "time": 1749836805864,
+                    "endTime": 1749836831714,
+                    "secondsFromStart": 34.09,
+                    "duration": 20029.994140625,
+                    "source": ""
+                  },
+                  {
+                    "role": "user",
+                    "message": "What do I have to do?",
+                    "time": 1749836832424,
+                    "endTime": 1749836834004,
+                    "secondsFromStart": 60.65,
+                    "duration": 1580
+                  },
+                  {
+                    "role": "bot",
+                    "message": "All you",
+                    "time": 1749836835294,
+                    "endTime": 1749836835874,
+                    "secondsFromStart": 63.52,
+                    "duration": 580,
+                    "source": ""
+                  },
+                  {
+                    "role": "user",
+                    "message": "Get this?",
+                    "time": 1749836835454,
+                    "endTime": 1749836836054,
+                    "secondsFromStart": 63.68,
+                    "duration": 600
+                  },
+                  {
+                    "role": "bot",
+                    "message": "Yes. There's really nothing complicated. If you're interested, I'll have 1 of our human representatives reach out to you, uh, via email to find a time that works best for you for consultation. It's that simple. What do you think?",
+                    "time": 1749836838764.005,
+                    "endTime": 1749836850794,
+                    "secondsFromStart": 66.990005,
+                    "duration": 9899.981201171875,
+                    "source": ""
+                  },
+                  {
+                    "role": "user",
+                    "message": "No. I I love the idea. So how how do we proceed?",
+                    "time": 1749836852124,
+                    "endTime": 1749836856184,
+                    "secondsFromStart": 80.35,
+                    "duration": 3199.993896484375
+                  },
+                  {
+                    "role": "bot",
+                    "message": "That's fantastic to hear. We'll have 1 of our human reps reach out to you soon. Via email to schedule the consultation. A time that works best for you. Thank you for your interest. I'll mark your status as interested now. Just a moment, please.",
+                    "time": 1749836857714,
+                    "endTime": 1749836873304,
+                    "secondsFromStart": 85.94,
+                    "duration": 12930.002685546875,
+                    "source": ""
+                  },
+                  {
+                    "role": "user",
+                    "message": "Okay. Okay. Thank you.",
+                    "time": 1749836872933.996,
+                    "endTime": 1749836875353.994,
+                    "secondsFromStart": 101.159996,
+                    "duration": 2419.997802734375
+                  },
+                  {
+                    "toolCalls": [
+                      {
+                        "id": "call_vzGDWvj49GyoXQwBgCwZere5",
+                        "type": "function",
+                        "function": {
+                          "name": "endCall",
+                          "arguments": "{}"
+                        }
+                      }
+                    ],
+                    "role": "tool_calls",
+                    "message": "",
+                    "time": 1749836876294,
+                    "secondsFromStart": 104.583
+                  },
+                  {
+                    "role": "tool_call_result",
+                    "time": 1749836877064,
+                    "secondsFromStart": 105.353,
+                    "name": "endCall",
+                    "result": "Success.",
+                    "toolCallId": "call_vzGDWvj49GyoXQwBgCwZere5"
+                  }
+                ],
+                "messagesOpenAIFormatted": [
+                  {
+                    "role": "system",
+                    "content": "Role:\nYou are an AI sales assistant representing Business_experts. Your audience is small business owners and freelancers.\n\nTask:\nYour goal is to offer a free 15-minute Google Meet consultation with a human expert who provides personalized advice on online marketing, sales funnels, improving customer retention, social media advertising, and website conversion optimization.\n\nCall Introduction:\nWhen the call starts, introduce yourself and the purpose clearly and politely. For example:\n“Hi Sehal_Onic, this is Business_experts calling. We’re offering a free 15-minute Google Meet consultation with a human business expert who can help you improve your marketing and grow your sales.”\n\nHandling Questions:\nIf the lead asks for more details, explain that the consultation is personalized to their specific business goals and is completely free with no obligation.\n\nInterested Leads:\nIf the lead expresses interest, respond warmly and let them know:\n“We’ll have one of our human reps reach out soon via email to schedule the consultation at a time that works best for you.”\n\nMark their status as ‘interested’ in the system, thank them politely and end the call courteously using the \"endCall\" function.\n\nNot Interested Leads:\nIf the lead is not interested, thank them politely and end the call courteously using the \"endCall\" function..\n\nTone:\nMaintain a friendly, clear, confident, and professional tone throughout the call.\n\nIf lead stays quiet try to convince him again for him agree and make him interested\nif lead doesnt speak continue talking to him about the services human expert can provide to him"
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "Hi, This is an outreach call from business experts."
+                  },
+                  {
+                    "role": "user",
+                    "content": "Could you please repeat? I couldn't hear you properly."
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "Of course. Hi. This is business experts calling. We're offering a free 15 minute Google Meet consultation. A human business expert who can help you improve your marketing and grow your sales. You be interested in hearing more?"
+                  },
+                  {
+                    "role": "user",
+                    "content": "Yeah. Could you please uh, explain"
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "Absolutely. The consultation is a personalized session. 1 of our experts will talk to you about your specific business goals. They can provide tailored advice on various topics, including online marketing strategies, sales funnels, customer retention, improvements, social media advertising, and website conversion optimization. And the best part? It's completely free. With no obligation. You be interested in"
+                  },
+                  {
+                    "role": "user",
+                    "content": "What do I have to do?"
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "All you"
+                  },
+                  {
+                    "role": "user",
+                    "content": "Get this?"
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "Yes. There's really nothing complicated. If you're interested, I'll have 1 of our human representatives reach out to you, uh, via email to find a time that works best for you for consultation. It's that simple. What do you think?"
+                  },
+                  {
+                    "role": "user",
+                    "content": "No. I I love the idea. So how how do we proceed?"
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "That's fantastic to hear. We'll have 1 of our human reps reach out to you soon. Via email to schedule the consultation. A time that works best for you. Thank you for your interest. I'll mark your status as interested now. Just a moment, please."
+                  },
+                  {
+                    "role": "user",
+                    "content": "Okay. Okay. Thank you."
+                  },
+                  {
+                    "role": "assistant",
+                    "tool_calls": [
+                      {
+                        "id": "call_vzGDWvj49GyoXQwBgCwZere5",
+                        "type": "function",
+                        "function": {
+                          "name": "endCall",
+                          "arguments": "{}"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "role": "tool",
+                    "tool_call_id": "call_vzGDWvj49GyoXQwBgCwZere5",
+                    "content": "Success."
+                  }
+                ],
+                "transcript": "AI: Hi, This is an outreach call from business experts.\nUser: Could you please repeat? I couldn't hear you properly.\nAI: Of course. Hi. This is business experts calling. We're offering a free 15 minute Google Meet consultation. A human business expert who can help you improve your marketing and grow your sales. You be interested in hearing more?\nUser: Yeah. Could you please uh, explain\nAI: Absolutely. The consultation is a personalized session. 1 of our experts will talk to you about your specific business goals. They can provide tailored advice on various topics, including online marketing strategies, sales funnels, customer retention, improvements, social media advertising, and website conversion optimization. And the best part? It's completely free. With no obligation. You be interested in\nUser: What do I have to do?\nAI: All you\nUser: Get this?\nAI: Yes. There's really nothing complicated. If you're interested, I'll have 1 of our human representatives reach out to you, uh, via email to find a time that works best for you for consultation. It's that simple. What do you think?\nUser: No. I I love the idea. So how how do we proceed?\nAI: That's fantastic to hear. We'll have 1 of our human reps reach out to you soon. Via email to schedule the consultation. A time that works best for you. Thank you for your interest. I'll mark your status as interested now. Just a moment, please.\nUser: Okay. Okay. Thank you.\n",
+                "recordingUrl": "https://storage.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e-1749836879732-b2aa3892-1bfb-4e15-985e-4e353103991d-mono.wav",
+                "stereoRecordingUrl": "https://storage.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e-1749836879732-8c78a560-8d48-4701-9815-d0bd6c528fe6-stereo.wav",
+                "recording": {
+                  "stereoUrl": "https://storage.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e-1749836879732-8c78a560-8d48-4701-9815-d0bd6c528fe6-stereo.wav",
+                  "mono": {
+                    "combinedUrl": "https://storage.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e-1749836879732-b2aa3892-1bfb-4e15-985e-4e353103991d-mono.wav",
+                    "assistantUrl": "https://storage.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e-1749836879732-7f32e37a-2443-4124-9ead-d457d795e3a1-mono.wav",
+                    "customerUrl": "https://storage.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e-1749836879732-e796ff37-0fdd-4598-8475-5c37a09941a5-mono.wav"
+                  }
+                },
+                "nodes": [],
+                "variables": {}
+              },
+              "startedAt": "2025-06-13T17:46:11.711Z",
+              "endedAt": "2025-06-13T17:47:57.228Z",
+              "endedReason": "assistant-ended-call",
+              "cost": 0.183,
+              "costBreakdown": {
+                "stt": 0.018,
+                "llm": 0.001,
+                "tts": 0.0759,
+                "vapi": 0.0879,
+                "chat": 0,
+                "total": 0.183,
+                "llmPromptTokens": 5585,
+                "llmCompletionTokens": 289,
+                "ttsCharacters": 1518,
+                "voicemailDetectionCost": 0,
+                "knowledgeBaseCost": 0,
+                "analysisCostBreakdown": {
+                  "summary": 0.0001,
+                  "summaryPromptTokens": 402,
+                  "summaryCompletionTokens": 57,
+                  "structuredData": 0,
+                  "structuredDataPromptTokens": 0,
+                  "structuredDataCompletionTokens": 0,
+                  "successEvaluation": 0.0001,
+                  "successEvaluationPromptTokens": 789,
+                  "successEvaluationCompletionTokens": 1
+                }
+              },
+              "costs": [
+                {
+                  "type": "transcriber",
+                  "transcriber": {
+                    "provider": "deepgram",
+                    "model": "nova-2"
+                  },
+                  "minutes": 1.8366166666666668,
+                  "cost": 0.01798855
+                },
+                {
+                  "type": "model",
+                  "model": {
+                    "provider": "openai",
+                    "model": "gpt-4o-mini"
+                  },
+                  "promptTokens": 5585,
+                  "completionTokens": 289,
+                  "cost": 0.00101115
+                },
+                {
+                  "type": "voice",
+                  "voice": {
+                    "provider": "vapi",
+                    "voiceId": "dN8hviqdNrAsEcL57yFj",
+                    "model": "eleven_turbo_v2_5"
+                  },
+                  "characters": 1518,
+                  "cost": 0.0759
+                },
+                {
+                  "type": "vapi",
+                  "subType": "normal",
+                  "minutes": 1.7586,
+                  "cost": 0.08793
+                },
+                {
+                  "type": "analysis",
+                  "analysisType": "summary",
+                  "model": {
+                    "provider": "google",
+                    "model": "gemini-2.5-flash-preview-04-17"
+                  },
+                  "promptTokens": 402,
+                  "completionTokens": 57,
+                  "cost": 0.0000945
+                },
+                {
+                  "type": "analysis",
+                  "analysisType": "successEvaluation",
+                  "model": {
+                    "provider": "google",
+                    "model": "gemini-2.5-flash-preview-04-17"
+                  },
+                  "promptTokens": 789,
+                  "completionTokens": 1,
+                  "cost": 0.00011895
+                },
+                {
+                  "type": "knowledge-base",
+                  "model": {
+                    "provider": "google",
+                    "model": "gemini-1.5-flash"
+                  },
+                  "promptTokens": 0,
+                  "completionTokens": 0,
+                  "cost": 0
+                }
+              ],
+              "durationMs": 105517,
+              "durationSeconds": 105.517,
+              "durationMinutes": 1.7586,
+              "summary": "A company called Business Experts offered the user a free 15-minute Google Meet consultation to discuss improving marketing and sales. The user was interested and asked how to proceed. A human representative will reach out via email to schedule the consultation at a time that works best for the user.",
+              "transcript": "AI: Hi, This is an outreach call from business experts.\nUser: Could you please repeat? I couldn't hear you properly.\nAI: Of course. Hi. This is business experts calling. We're offering a free 15 minute Google Meet consultation. A human business expert who can help you improve your marketing and grow your sales. You be interested in hearing more?\nUser: Yeah. Could you please uh, explain\nAI: Absolutely. The consultation is a personalized session. 1 of our experts will talk to you about your specific business goals. They can provide tailored advice on various topics, including online marketing strategies, sales funnels, customer retention, improvements, social media advertising, and website conversion optimization. And the best part? It's completely free. With no obligation. You be interested in\nUser: What do I have to do?\nAI: All you\nUser: Get this?\nAI: Yes. There's really nothing complicated. If you're interested, I'll have 1 of our human representatives reach out to you, uh, via email to find a time that works best for you for consultation. It's that simple. What do you think?\nUser: No. I I love the idea. So how how do we proceed?\nAI: That's fantastic to hear. We'll have 1 of our human reps reach out to you soon. Via email to schedule the consultation. A time that works best for you. Thank you for your interest. I'll mark your status as interested now. Just a moment, please.\nUser: Okay. Okay. Thank you.\n",
+              "messages": [
+                {
+                  "role": "system",
+                  "message": "Role:\nYou are an AI sales assistant representing Business_experts. Your audience is small business owners and freelancers.\n\nTask:\nYour goal is to offer a free 15-minute Google Meet consultation with a human expert who provides personalized advice on online marketing, sales funnels, improving customer retention, social media advertising, and website conversion optimization.\n\nCall Introduction:\nWhen the call starts, introduce yourself and the purpose clearly and politely. For example:\n“Hi Sehal_Onic, this is Business_experts calling. We’re offering a free 15-minute Google Meet consultation with a human business expert who can help you improve your marketing and grow your sales.”\n\nHandling Questions:\nIf the lead asks for more details, explain that the consultation is personalized to their specific business goals and is completely free with no obligation.\n\nInterested Leads:\nIf the lead expresses interest, respond warmly and let them know:\n“We’ll have one of our human reps reach out soon via email to schedule the consultation at a time that works best for you.”\n\nMark their status as ‘interested’ in the system, thank them politely and end the call courteously using the \"endCall\" function.\n\nNot Interested Leads:\nIf the lead is not interested, thank them politely and end the call courteously using the \"endCall\" function..\n\nTone:\nMaintain a friendly, clear, confident, and professional tone throughout the call.\n\nIf lead stays quiet try to convince him again for him agree and make him interested\nif lead doesnt speak continue talking to him about the services human expert can provide to him",
+                  "time": 1749836771563,
+                  "secondsFromStart": 0
+                },
+                {
+                  "role": "bot",
+                  "message": "Hi, This is an outreach call from business experts.",
+                  "time": 1749836772894,
+                  "endTime": 1749836775794,
+                  "secondsFromStart": 1.12,
+                  "duration": 2900,
+                  "source": ""
+                },
+                {
+                  "role": "user",
+                  "message": "Could you please repeat? I couldn't hear you properly.",
+                  "time": 1749836780534,
+                  "endTime": 1749836782944,
+                  "secondsFromStart": 8.76,
+                  "duration": 2410
+                },
+                {
+                  "role": "bot",
+                  "message": "Of course. Hi. This is business experts calling. We're offering a free 15 minute Google Meet consultation. A human business expert who can help you improve your marketing and grow your sales. You be interested in hearing more?",
+                  "time": 1749836784924,
+                  "endTime": 1749836798694,
+                  "secondsFromStart": 13.15,
+                  "duration": 11520.0009765625,
+                  "source": ""
+                },
+                {
+                  "role": "user",
+                  "message": "Yeah. Could you please uh, explain",
+                  "time": 1749836799424,
+                  "endTime": 1749836802219,
+                  "secondsFromStart": 27.65,
+                  "duration": 2515
+                },
+                {
+                  "role": "bot",
+                  "message": "Absolutely. The consultation is a personalized session. 1 of our experts will talk to you about your specific business goals. They can provide tailored advice on various topics, including online marketing strategies, sales funnels, customer retention, improvements, social media advertising, and website conversion optimization. And the best part? It's completely free. With no obligation. You be interested in",
+                  "time": 1749836805864,
+                  "endTime": 1749836831714,
+                  "secondsFromStart": 34.09,
+                  "duration": 20029.994140625,
+                  "source": ""
+                },
+                {
+                  "role": "user",
+                  "message": "What do I have to do?",
+                  "time": 1749836832424,
+                  "endTime": 1749836834004,
+                  "secondsFromStart": 60.65,
+                  "duration": 1580
+                },
+                {
+                  "role": "bot",
+                  "message": "All you",
+                  "time": 1749836835294,
+                  "endTime": 1749836835874,
+                  "secondsFromStart": 63.52,
+                  "duration": 580,
+                  "source": ""
+                },
+                {
+                  "role": "user",
+                  "message": "Get this?",
+                  "time": 1749836835454,
+                  "endTime": 1749836836054,
+                  "secondsFromStart": 63.68,
+                  "duration": 600
+                },
+                {
+                  "role": "bot",
+                  "message": "Yes. There's really nothing complicated. If you're interested, I'll have 1 of our human representatives reach out to you, uh, via email to find a time that works best for you for consultation. It's that simple. What do you think?",
+                  "time": 1749836838764.005,
+                  "endTime": 1749836850794,
+                  "secondsFromStart": 66.990005,
+                  "duration": 9899.981201171875,
+                  "source": ""
+                },
+                {
+                  "role": "user",
+                  "message": "No. I I love the idea. So how how do we proceed?",
+                  "time": 1749836852124,
+                  "endTime": 1749836856184,
+                  "secondsFromStart": 80.35,
+                  "duration": 3199.993896484375
+                },
+                {
+                  "role": "bot",
+                  "message": "That's fantastic to hear. We'll have 1 of our human reps reach out to you soon. Via email to schedule the consultation. A time that works best for you. Thank you for your interest. I'll mark your status as interested now. Just a moment, please.",
+                  "time": 1749836857714,
+                  "endTime": 1749836873304,
+                  "secondsFromStart": 85.94,
+                  "duration": 12930.002685546875,
+                  "source": ""
+                },
+                {
+                  "role": "user",
+                  "message": "Okay. Okay. Thank you.",
+                  "time": 1749836872933.996,
+                  "endTime": 1749836875353.994,
+                  "secondsFromStart": 101.159996,
+                  "duration": 2419.997802734375
+                },
+                {
+                  "toolCalls": [
+                    {
+                      "id": "call_vzGDWvj49GyoXQwBgCwZere5",
+                      "type": "function",
+                      "function": {
+                        "name": "endCall",
+                        "arguments": "{}"
+                      }
+                    }
+                  ],
+                  "role": "tool_calls",
+                  "message": "",
+                  "time": 1749836876294,
+                  "secondsFromStart": 104.583
+                },
+                {
+                  "role": "tool_call_result",
+                  "time": 1749836877064,
+                  "secondsFromStart": 105.353,
+                  "name": "endCall",
+                  "result": "Success.",
+                  "toolCallId": "call_vzGDWvj49GyoXQwBgCwZere5"
+                }
+              ],
+              "recordingUrl": "https://storage.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e-1749836879732-b2aa3892-1bfb-4e15-985e-4e353103991d-mono.wav",
+              "stereoRecordingUrl": "https://storage.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e-1749836879732-8c78a560-8d48-4701-9815-d0bd6c528fe6-stereo.wav",
+              "call": {
+                "id": "28760a98-4d2c-4ba4-a162-a146201ab52e",
+                "orgId": "9c92e7a8-8889-4c8a-8bc2-bada757c2f18",
+                "createdAt": "2025-06-13T17:45:49.349Z",
+                "updatedAt": "2025-06-13T17:45:49.349Z",
+                "type": "outboundPhoneCall",
+                "monitor": {
+                  "listenUrl": "wss://phone-call-websocket.aws-us-west-2-backend-production1.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e/listen",
+                  "controlUrl": "https://phone-call-websocket.aws-us-west-2-backend-production1.vapi.ai/28760a98-4d2c-4ba4-a162-a146201ab52e/control"
+                },
+                "transport": {
+                  "provider": "twilio",
+                  "callSid": "CAa3391df159dca8b2e3d61fca6e4069d2",
+                  "accountSid": "ACfe5fc940a90c41f3efa3cbb31546cf6d"
+                },
+                "phoneCallProvider": "twilio",
+                "phoneCallProviderId": "CAa3391df159dca8b2e3d61fca6e4069d2",
+                "phoneCallTransport": "pstn",
+                "status": "queued",
+                "assistantId": "7172b0ee-6f74-48d3-ae30-a5c020aff433",
+                "phoneNumberId": "a5183e8c-e5f1-4606-831b-d9735b76c09c",
+                "customer": {
+                  "number": "+923392273743",
+                  "name": "Sehal_Onic"
+                }
+              },
+              "phoneNumber": {
+                "id": "a5183e8c-e5f1-4606-831b-d9735b76c09c",
+                "orgId": "9c92e7a8-8889-4c8a-8bc2-bada757c2f18",
+                "assistantId": "7172b0ee-6f74-48d3-ae30-a5c020aff433",
+                "number": "+15175542263",
+                "createdAt": "2025-06-10T12:32:32.064Z",
+                "updatedAt": "2025-06-10T12:32:43.579Z",
+                "twilioAccountSid": "ACfe5fc940a90c41f3efa3cbb31546cf6d",
+                "name": "US_NUM_TWILLIO",
+                "provider": "twilio",
+                "status": "active",
+                "smsEnabled": true
+              },
+              "customer": {
+                "number": "+923392273743",
+                "name": "Sehal_Onic"
+              },
+              "assistant": {
+                "id": "7172b0ee-6f74-48d3-ae30-a5c020aff433",
+                "orgId": "9c92e7a8-8889-4c8a-8bc2-bada757c2f18",
+                "name": "AI_Sales_Agent",
+                "voice": {
+                  "voiceId": "Elliot",
+                  "provider": "vapi"
+                },
+                "createdAt": "2025-06-07T20:55:26.692Z",
+                "updatedAt": "2025-06-13T17:26:04.585Z",
+                "model": {
+                  "model": "gpt-4o-mini",
+                  "messages": [
+                    {
+                      "role": "system",
+                      "content": "Role:\nYou are an AI sales assistant representing Business_experts. Your audience is small business owners and freelancers.\n\nTask:\nYour goal is to offer a free 15-minute Google Meet consultation with a human expert who provides personalized advice on online marketing, sales funnels, improving customer retention, social media advertising, and website conversion optimization.\n\nCall Introduction:\nWhen the call starts, introduce yourself and the purpose clearly and politely. For example:\n“Hi Sehal_Onic, this is Business_experts calling. We’re offering a free 15-minute Google Meet consultation with a human business expert who can help you improve your marketing and grow your sales.”\n\nHandling Questions:\nIf the lead asks for more details, explain that the consultation is personalized to their specific business goals and is completely free with no obligation.\n\nInterested Leads:\nIf the lead expresses interest, respond warmly and let them know:\n“We’ll have one of our human reps reach out soon via email to schedule the consultation at a time that works best for you.”\n\nMark their status as ‘interested’ in the system, thank them politely and end the call courteously using the \"endCall\" function.\n\nNot Interested Leads:\nIf the lead is not interested, thank them politely and end the call courteously using the \"endCall\" function..\n\nTone:\nMaintain a friendly, clear, confident, and professional tone throughout the call.\n\nIf lead stays quiet try to convince him again for him agree and make him interested\nif lead doesnt speak continue talking to him about the services human expert can provide to him"
+                    }
+                  ],
+                  "provider": "openai"
+                },
+                "firstMessage": "Hi Sehal_Onic, this is an outreach call from Business_experts...”",
+                "voicemailMessage": "Please call back when you're available.",
+                "endCallFunctionEnabled": true,
+                "endCallMessage": "Goodbye.",
+                "transcriber": {
+                  "model": "nova-2",
+                  "language": "en",
+                  "provider": "deepgram"
+                },
+                "serverMessages": [
+                  "end-of-call-report"
+                ],
+                "startSpeakingPlan": {
+                  "waitSeconds": 1.6,
+                  "smartEndpointingPlan": {
+                    "provider": "livekit"
+                  }
+                },
+                "stopSpeakingPlan": {
+                  "backoffSeconds": 3
+                },
+                "server": {
+                  "url": "https://sehal29.app.n8n.cloud/webhook-test/92a70fa0-101a-4ff1-952c-0e3fde4cdd04",
+                  "timeoutSeconds": 20
+                }
+              }
+            }
+          },
+          "webhookUrl": "https://sehal29.app.n8n.cloud/webhook-test/92a70fa0-101a-4ff1-952c-0e3fde4cdd04",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Event = end of call report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event = end of call report": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Condition  = Answered": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Condition  = Answered",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2b9f5028-9e72-483b-899c-6ad8f7782c3a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d2a993a32face2f3821351485ad91642492956bdf0c7d2ae9f4a79c0ab5d10c7"
+  },
+  "id": "SVGRsDlfnrx6V39X",
+  "tags": []
+}

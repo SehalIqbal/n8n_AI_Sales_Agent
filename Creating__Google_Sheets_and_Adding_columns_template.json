@@ -1,0 +1,305 @@
+{
+  "name": "Creating _Google_Sheets_and Adding columns_template",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a1716bb4-34ee-4d0a-8cec-ac29f2195510",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "29812bd6-817d-4811-817d-8076b87092fe",
+              "name": "columns",
+              "value": "id,phoneCallProviderId,phoneNumberId,customerNumber,type,startedAt,endedAt,durationMs,cost_stt,cost_llm,cost_tts,cost_total,cost_twilio,endedReason,transcript,recordingUrl",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        780,
+        0
+      ],
+      "id": "4204cb30-9e2a-4b66-a825-fc78ed02f5b0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst headersArray = $json.columns.split(',');\n\nconst headersObject = {};\nheadersArray.forEach(header => {\n\n  const trimmedHeader = header.trim();\n  headersObject[trimmedHeader] = trimmedHeader;\n});\n\n // Return the object so that each header becomes a column in the first row of your sheet\nreturn [\n  {\n    json: headersObject\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        0
+      ],
+      "id": "7537cd67-ff26-465b-923e-4d102232c7e9",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY",
+          "mode": "list",
+          "cachedResultName": "AI_Sales_Lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit?usp=drivesdk"
+        },
+        "title": "Raw Data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        220,
+        0
+      ],
+      "id": "856e16c4-01e7-40a8-bca4-6c3cdbe9580b",
+      "name": "creating_Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4XDBupGPB746DKmp",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "n8n_Tests",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        380,
+        0
+      ],
+      "id": "d7296aed-4cbb-4ee3-9149-53287aaf373d",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "12YW5dHbhcoTZJHg",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('creating_Sheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1gs7iZWAuJ02SvI41WxouOS4nApKnGhsz",
+          "mode": "list",
+          "cachedResultName": "n8n_Tests",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1gs7iZWAuJ02SvI41WxouOS4nApKnGhsz"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        560,
+        0
+      ],
+      "id": "4ec13b0b-fed7-4a3b-96dd-94dbdd075320",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "12YW5dHbhcoTZJHg",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('creating_Sheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Raw Data",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        680,
+        240
+      ],
+      "id": "552ae2c7-f31f-4fb7-a510-c63b275d0426",
+      "name": "Adding columns",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4XDBupGPB746DKmp",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('creating_Sheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Raw Data",
+          "mode": "name"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        900,
+        240
+      ],
+      "id": "337cdd7d-e376-4c08-b181-21c34fff49f3",
+      "name": "deleting the extra row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4XDBupGPB746DKmp",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "creating_Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Adding columns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "creating_Sheet": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adding columns": {
+      "main": [
+        [
+          {
+            "node": "deleting the extra row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8d8cc0c6-ab82-4330-8dbb-94d3b4c84f7a",
+  "meta": {
+    "instanceId": "d2a993a32face2f3821351485ad91642492956bdf0c7d2ae9f4a79c0ab5d10c7"
+  },
+  "id": "L2g4H2uukOCQGr6r",
+  "tags": []
+}

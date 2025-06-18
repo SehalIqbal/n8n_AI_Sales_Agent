@@ -1,0 +1,275 @@
+{
+  "name": "AI_Sales Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "98dc4f63-2a42-4e04-ba9b-4dbd5cd00315",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY",
+          "mode": "list",
+          "cachedResultName": "AI_Sales_Lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        440,
+        0
+      ],
+      "id": "b5482d1f-6ec0-40bc-83b2-dffad75f789b",
+      "name": "Google Sheets",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0TYItdj5b1Z1BTs2",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28a7fb37-be01-42bf-a9a2-a2c800428399",
+              "name": "ID",
+              "value": "={{ $json.row_number }}",
+              "type": "string"
+            },
+            {
+              "id": "90a96382-3aed-4fe0-b5a1-770e067b9b7d",
+              "name": "Name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "4863a72e-9033-4ead-88aa-a2831e1dbb65",
+              "name": "Phone number",
+              "value": "={{ $json['Phone number'] }}",
+              "type": "string"
+            },
+            {
+              "id": "2d0f5d75-1c29-49d4-88e4-009e5533ceb4",
+              "name": "Status",
+              "value": "={{ $json.Status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        0
+      ],
+      "id": "35ffc729-ee3c-49f6-bcf9-2250c2cdf9cc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vapi.ai/call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 8ada863e-deab-436b-9f78-885e2ee7c187"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"assistantId\": \"7172b0ee-6f74-48d3-ae30-a5c020aff433\",\n  \"phoneNumberId\": \"a5183e8c-e5f1-4606-831b-d9735b76c09c\",\n  \"customer\": {\n    \"name\": \"{{ $json.Name }}\",\n    \"number\": \"{{ $json['Phone number'].trim() }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        0
+      ],
+      "id": "9380a49d-2d83-44e7-b08c-0b56dadc95e4",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY",
+          "mode": "list",
+          "cachedResultName": "AI_Sales_Lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1P1UzNaZGxAc41q_YUMGkWvseWwdtXtcjdpmgzbWREPY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Edit Fields').item.json.ID }}",
+            "Status": "in Progress"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone number",
+              "displayName": "Phone number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1080,
+        0
+      ],
+      "id": "820eaaba-a529-4b05-bb37-0634b7120894",
+      "name": "Change status to in Progress",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4XDBupGPB746DKmp",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Change status to in Progress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3e3911a9-0633-44ca-81fe-78195cb77fc0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d2a993a32face2f3821351485ad91642492956bdf0c7d2ae9f4a79c0ab5d10c7"
+  },
+  "id": "O2VukXx8CLikTgsi",
+  "tags": []
+}
